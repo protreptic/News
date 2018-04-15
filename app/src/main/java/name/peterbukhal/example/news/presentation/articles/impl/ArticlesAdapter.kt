@@ -17,6 +17,11 @@ import name.peterbukhal.example.news.support.glide.GlideApp
 class ArticlesAdapter(private var data: List<ArticleModel> = listOf()) :
         RecyclerView.Adapter<ArticlesAdapter.ArticleViewHolder>() {
 
+    interface ArticlesListener {
+
+        fun onArticleClicked(article: ArticleModel)
+    }
+
     fun setData(newData: List<ArticleModel>) {
         data = newData
 
@@ -32,16 +37,16 @@ class ArticlesAdapter(private var data: List<ArticleModel> = listOf()) :
     override fun getItemCount() = data.size
 
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
-        data[position].let { item -> holder.bindItem(item, listener) }
+        data[position].let { item -> holder.bindItem(item, position) }
     }
 
-    class ArticleViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    inner class ArticleViewHolder(view: View): RecyclerView.ViewHolder(view) {
 
         private val vImage: ImageView by bindView(R.id.vImage)
         private val vViewed: TextView by bindView(R.id.vViewed)
         private val vTitle: TextView by bindView(R.id.vTitle)
 
-        fun bindItem(article: ArticleModel, lis: ArticlesListener?) {
+        fun bindItem(article: ArticleModel, position: Int) {
             article.let {
                 GlideApp.with(itemView)
                         .load(it.imageUri)
@@ -54,8 +59,10 @@ class ArticlesAdapter(private var data: List<ArticleModel> = listOf()) :
 
                 itemView.setOnClickListener {
                     article.viewed = true
-                    
-                    lis?.onArticleClicked(article)
+
+                    listener?.onArticleClicked(article)
+
+                    notifyItemChanged(position)
                 }
             }
         }

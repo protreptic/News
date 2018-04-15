@@ -14,6 +14,12 @@ import name.peterbukhal.example.news.R
 class ArticlesRecentAdapter(private var data: List<String> = listOf()) :
         RecyclerView.Adapter<ArticlesRecentAdapter.ArticleViewHolder>() {
 
+    interface ArticlesRecentListener {
+
+        fun onArticleRecentClicked(recentQuery: String)
+
+    }
+
     fun setData(newData: List<String>) {
         data = newData
 

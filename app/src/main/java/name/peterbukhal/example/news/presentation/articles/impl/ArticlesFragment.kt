@@ -15,9 +15,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kotterknife.bindView
 import name.peterbukhal.example.news.R
 import name.peterbukhal.example.news.activity.abs.AbsFragment
-import name.peterbukhal.example.news.presentation.articles.ArticlesPresenter
-import name.peterbukhal.example.news.presentation.articles.ArticlesRouter
-import name.peterbukhal.example.news.presentation.articles.ArticlesView
+import name.peterbukhal.example.news.presentation.articles.*
 import name.peterbukhal.example.news.presentation.articles.article.impl.ArticleFragment
 import name.peterbukhal.example.news.presentation.articles.model.ArticleModel
 import name.peterbukhal.example.news.support.dismissKeyboard
@@ -61,17 +59,12 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        vRecentContent.setOnClickListener {
-            vRecentContent.visibility = View.GONE
-        }
-
         vRecentQueries.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = articlesRecentAdapter.apply {
-                listener = object : ArticlesRecentListener {
+                listener = object : ArticlesRecentAdapter.ArticlesRecentListener {
 
                     override fun onArticleRecentClicked(recentQuery: String) {
-                        vRecentContent.visibility = View.GONE
                         vSearch.text = recentQuery
 
                         dismissKeyboard(activity)
@@ -83,19 +76,13 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
         vArticles.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = articlesAdapter.apply {
-                listener = object : ArticlesListener {
+                listener = object : ArticlesAdapter.ArticlesListener {
 
                     override fun onArticleClicked(article: ArticleModel) {
-                        adapter.notifyDataSetChanged()
-
                         presenter.displayArticle(article)
                     }
                 }
             }
-        }
-
-        vSearch.setOnClickListener {
-            presenter.displayRecent()
         }
 
         disposables.addAll(
@@ -105,6 +92,12 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
                     vClear.visibility = View.GONE
                     vSearch.text = ""
                 }),
+            RxView
+                .clicks(vRecentContent)
+                .subscribe({ presenter.dismissRecent() }),
+            RxView
+                .clicks(vSearch)
+                .subscribe({ presenter.displayRecent() }),
             RxTextView
                 .afterTextChangeEvents(vSearch)
                 .skip(1)
@@ -121,7 +114,6 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
                             presenter.displayArticles(pattern)
 
                             vClear.visibility = View.VISIBLE
-                            vRecentContent.visibility = View.GONE
                         }
                     }
                 }
@@ -149,19 +141,21 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
         }
     }
 
-    override fun toArticle(article: ArticleModel) {
+    override fun hideRecentQuery() {
         vRecentContent.visibility = View.GONE
+    }
 
+    override fun toArticle(article: ArticleModel) {
         fragmentManager!!
-                .beginTransaction()
-                .setCustomAnimations(
-                        R.anim.slide_in_right, R.anim.slide_out_left,
-                        R.anim.slide_in_right, R.anim.slide_out_left)
-                .add(android.R.id.content,
-                        ArticleFragment.newInstance(article.id),
-                        ArticleFragment.FRAGMENT_TAG)
-                .addToBackStack(null)
-                .commit()
+            .beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_right, R.anim.slide_out_left)
+            .add(android.R.id.content,
+                ArticleFragment.newInstance(article.id),
+                ArticleFragment.FRAGMENT_TAG)
+            .addToBackStack(null)
+            .commit()
 
         dismissKeyboard(activity)
     }

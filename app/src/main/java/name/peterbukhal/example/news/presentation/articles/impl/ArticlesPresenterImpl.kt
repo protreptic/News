@@ -36,6 +36,8 @@ class ArticlesPresenterImpl(
     }
 
     private fun showArticles(articles: List<ArticleModel>) {
+        dismissRecent()
+
         when (articles.isEmpty()) {
             true -> attachedView.showEmpty()
             else -> attachedView.showArticles(articles)
@@ -47,6 +49,10 @@ class ArticlesPresenterImpl(
             repository.fetchRecent()
                 .subscribe({ attachedView.showRecentQuery(it) },
                         { attachedView.showError() }))
+    }
+
+    override fun dismissRecent() {
+        attachedView.hideRecentQuery()
     }
 
     override fun displayArticle(article: ArticleModel) {

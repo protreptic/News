@@ -7,6 +7,7 @@ interface ArticlesView : View {
 
     fun showArticles(articles: List<ArticleModel>)
     fun showRecentQuery(queries: List<String>)
+    fun hideRecentQuery()
 
     fun showLoading()
     fun showEmpty()

@@ -8,5 +8,6 @@ interface ArticlesPresenter : Presenter<ArticlesView> {
     fun displayArticles(query: String = "")
     fun displayArticle(article: ArticleModel)
     fun displayRecent()
+    fun dismissRecent()
 
 }
