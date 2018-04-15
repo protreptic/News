@@ -12,11 +12,13 @@ open class SearchQuery : RealmObject() {
     companion object {
 
         const val FIELD_QUERY = "query"
+        const val FIELD_QUERIED_AT = "queriedAt"
         const val FIELD_ARTICLES = "articles"
     }
 
     @PrimaryKey
     var query: String = ""
+    var queriedAt: Long = 0
     var articles: RealmList<Article> = RealmList()
 
 }

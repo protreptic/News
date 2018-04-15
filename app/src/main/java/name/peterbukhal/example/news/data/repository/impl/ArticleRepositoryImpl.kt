@@ -12,12 +12,18 @@ class ArticleRepositoryImpl(
 
     override fun fetch(query: String, fromCache: Boolean): Observable<List<Article>> =
             when (fromCache) {
-                true -> cache.fetch(query)
-                            .flatMap {
-                                when (query.isNotEmpty() && it.isEmpty()) {
-                                    true -> fetch(query, false)
-                                    else -> Observable.just(it)
-                                }}
+                true -> {
+                    if (query.isEmpty()) {
+                        cache.fetchLast()
+                    } else {
+                        cache.fetch(query)
+                             .flatMap {
+                                  when (it.isEmpty()) {
+                                       true -> cloud.fetch(query)
+                                       else -> Observable.just(it)
+                                  }}
+                    }
+                }
                 else -> cloud.fetch(query)
             }
 

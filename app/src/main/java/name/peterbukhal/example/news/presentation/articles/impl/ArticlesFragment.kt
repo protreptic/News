@@ -87,8 +87,6 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
                 .doOnNext { pattern ->
                     when (pattern.isEmpty()) {
                         true  -> {
-                            presenter.displayArticles()
-
                             vClear.visibility = View.GONE
                         }
                         else -> {
