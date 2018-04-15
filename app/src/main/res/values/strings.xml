@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">News</string>
+    <string name="viewed">просмотрено</string>
+
+    <string name="type_filter_message">Искать статьи</string>
+    <string name="no_articles_found">Статьи не найдены</string>
+    <string name="error">Что-то пошло не так…</string>
+</resources>

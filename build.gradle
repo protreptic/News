@@ -1,0 +1,34 @@
+buildscript {
+    ext {
+        kotlin_version = '1.2.21'
+        android_support_version = '27.1.1'
+        android_espresso_version = '3.0.1'
+        okhttp_version = '3.9.1'
+        retrofit_version = '2.3.0'
+        firebase_version = '12.0.1'
+        exoplayer_version = '2.7.1'
+        conductor_version = '2.1.4'
+    }
+
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "io.realm:realm-gradle-plugin:4.3.3"
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

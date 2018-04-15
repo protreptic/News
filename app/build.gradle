@@ -1,0 +1,65 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 27
+
+        applicationId "name.peterbukhal.example.news"
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "com.android.support:appcompat-v7:$android_support_version"
+    implementation "com.android.support:design:$android_support_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.5'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.0.0'
+    implementation 'com.jakewharton:kotterknife:0.1.0-SNAPSHOT'
+
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    implementation 'com.github.bumptech.glide:glide:4.5.0'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.15.0'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$android_espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$android_espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$android_espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-accessibility:$android_espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-web:$android_espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-idling-resource:$android_espresso_version"
+    androidTestImplementation "com.android.support.test.espresso.idling:idling-concurrent:$android_espresso_version"
+    kapt "com.github.bumptech.glide:compiler:4.5.0"
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://maven.google.com" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
