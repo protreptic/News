@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import com.jakewharton.rxbinding2.view.RxView
@@ -45,7 +44,10 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
     private val vEmpty: TextView by bindView(R.id.empty)
 
     private val vClear: ImageButton by bindView(R.id.clear)
-    private val vSearch: EditText by bindView(R.id.vSearch)
+    private val vSearch: TextView by bindView(R.id.vSearch)
+
+    private val vRecentContent: View by bindView(R.id.vRecentContent)
+    private val vRecentQueries: RecyclerView by bindView(R.id.vRecentQueries)
     private val vArticles: RecyclerView by bindView(R.id.vArticles)
 
     private val presenter: ArticlesPresenter by lazy {
@@ -53,15 +55,35 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
     }
 
     private val articlesAdapter = ArticlesAdapter()
+    private val articlesRecentAdapter = ArticlesRecentAdapter()
     private val disposables = CompositeDisposable()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        vRecentContent.setOnClickListener {
+            vRecentContent.visibility = View.GONE
+        }
+
+        vRecentQueries.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = articlesRecentAdapter.apply {
+                listener = object : ArticlesRecentListener {
+
+                    override fun onArticleRecentClicked(recentQuery: String) {
+                        vRecentContent.visibility = View.GONE
+                        vSearch.text = recentQuery
+
+                        dismissKeyboard(activity)
+                    }
+                }
+            }
+        }
+
         vArticles.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = articlesAdapter.apply {
-                articlesListener = object : ArticlesListener {
+                listener = object : ArticlesListener {
 
                     override fun onArticleClicked(article: ArticleModel) {
                         adapter.notifyDataSetChanged()
@@ -72,27 +94,34 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
             }
         }
 
+        vSearch.setOnClickListener {
+            presenter.displayRecent()
+        }
+
         disposables.addAll(
             RxView
                 .clicks(vClear)
                 .subscribe({
                     vClear.visibility = View.GONE
-                    vSearch.setText("")
+                    vSearch.text = ""
                 }),
             RxTextView
                 .afterTextChangeEvents(vSearch)
                 .skip(1)
-                .debounce(800, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .debounce(850, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map { pattern -> pattern.editable().toString() }
                 .doOnNext { pattern ->
                     when (pattern.isEmpty()) {
                         true  -> {
+                            presenter.displayRecent()
+
                             vClear.visibility = View.GONE
                         }
                         else -> {
                             presenter.displayArticles(pattern)
 
                             vClear.visibility = View.VISIBLE
+                            vRecentContent.visibility = View.GONE
                         }
                     }
                 }
@@ -108,9 +137,21 @@ class ArticlesFragment : AbsFragment(), ArticlesView, ArticlesRouter {
         vLoading.visibility = View.GONE
         vError.visibility = View.GONE
         vEmpty.visibility = View.GONE
+
+        dismissKeyboard(activity)
+    }
+
+    override fun showRecentQuery(queries: List<String>) {
+        articlesRecentAdapter.setData(queries)
+
+        if (queries.isNotEmpty() && vRecentContent.visibility != View.VISIBLE) {
+            vRecentContent.visibility = View.VISIBLE
+        }
     }
 
     override fun toArticle(article: ArticleModel) {
+        vRecentContent.visibility = View.GONE
+
         fragmentManager!!
                 .beginTransaction()
                 .setCustomAnimations(

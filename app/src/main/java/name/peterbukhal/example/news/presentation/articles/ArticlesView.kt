@@ -6,6 +6,7 @@ import name.peterbukhal.example.news.presentation.articles.model.ArticleModel
 interface ArticlesView : View {
 
     fun showArticles(articles: List<ArticleModel>)
+    fun showRecentQuery(queries: List<String>)
 
     fun showLoading()
     fun showEmpty()

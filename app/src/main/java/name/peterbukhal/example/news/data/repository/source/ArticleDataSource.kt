@@ -22,6 +22,13 @@ interface ArticleDataSource {
     fun fetchLast(): Observable<List<Article>> = Observable.empty()
 
     /**
+     * Возвращает отсортированый (по убыванию) список последних запросов.
+     *
+     * @return список последних запросов
+     */
+    fun fetchRecent(): Observable<List<String>> = Observable.empty()
+
+    /**
      * Возвращает статью по ее идентификатору.
      *
      * @param articleId идентификатор статьи

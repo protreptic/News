@@ -1,6 +1,5 @@
 package name.peterbukhal.example.news.presentation.articles.impl
 
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import name.peterbukhal.example.news.data.repository.ArticleRepository
 import name.peterbukhal.example.news.data.repository.ArticleRepositoryFactory
@@ -41,6 +40,13 @@ class ArticlesPresenterImpl(
             true -> attachedView.showEmpty()
             else -> attachedView.showArticles(articles)
         }
+    }
+
+    override fun displayRecent() {
+        disposables.add(
+            repository.fetchRecent()
+                .subscribe({ attachedView.showRecentQuery(it) },
+                        { attachedView.showError() }))
     }
 
     override fun displayArticle(article: ArticleModel) {

@@ -1,6 +1,7 @@
 package name.peterbukhal.example.news.data.repository.source.impl
 
 import io.reactivex.Observable
+import io.reactivex.Observable.*
 import io.realm.Realm
 import io.realm.Sort
 import name.peterbukhal.example.news.data.model.Article
@@ -19,22 +20,39 @@ class CacheArticleDataSource : ArticleDataSource {
                     .findFirst()
 
             return when (searchQuery == null || searchQuery.articles.isEmpty()) {
-                true -> Observable.just(listOf())
-                else -> Observable.just(storage.copyFromRealm(searchQuery!!.articles))
+                true -> just(listOf())
+                else -> just(storage.copyFromRealm(searchQuery!!.articles))
             }
         }
     }
 
     override fun fetchLast(): Observable<List<Article>> {
         Realm.getDefaultInstance().use { storage ->
-            val searchQuery =
+            val lastQuery =
+                    storage.copyFromRealm(
                     storage.where(SearchQuery::class.java)
                             .findAll()
-                            .sort(FIELD_QUERIED_AT, Sort.DESCENDING)
+                            .sort(FIELD_QUERIED_AT, Sort.DESCENDING))
 
-            return when (searchQuery.isEmpty()) {
-                true -> Observable.just(listOf())
-                else -> Observable.just(storage.copyFromRealm(searchQuery.first()!!.articles))
+            return when (lastQuery.isEmpty()) {
+                true -> just(listOf())
+                else -> just(lastQuery.first()!!.articles)
+            }
+        }
+    }
+
+    override fun fetchRecent(): Observable<List<String>> {
+        Realm.getDefaultInstance().use { storage ->
+            val recentQueries =
+                    storage.copyFromRealm(
+                    storage.where(SearchQuery::class.java)
+                            .findAll()
+                            .sort(FIELD_QUERIED_AT, Sort.DESCENDING))
+                            .map { it.query }
+
+            return when (recentQueries.isEmpty()) {
+                true -> just(listOf())
+                else -> just(recentQueries)
             }
         }
     }
@@ -48,8 +66,8 @@ class CacheArticleDataSource : ArticleDataSource {
                     .findFirst()
 
             return when (article == null) {
-                true -> Observable.error(RuntimeException())
-                else -> Observable.just(storage.copyFromRealm(article))
+                true -> error(RuntimeException())
+                else -> just(storage.copyFromRealm(article))
             }
         }
 
@@ -62,7 +80,7 @@ class CacheArticleDataSource : ArticleDataSource {
 
             storage.commitTransaction()
 
-            return Observable.just(retained)
+            return just(retained)
         }
 
 }

@@ -27,6 +27,9 @@ class ArticleRepositoryImpl(
                 else -> cloud.fetch(query)
             }
 
+    override fun fetchRecent(): Observable<List<String>> =
+            cache.fetchRecent()
+
     override fun fetchById(articleId: String): Observable<Article> =
             cache.fetchById(articleId)
 

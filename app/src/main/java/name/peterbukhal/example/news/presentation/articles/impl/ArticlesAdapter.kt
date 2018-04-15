@@ -23,7 +23,7 @@ class ArticlesAdapter(private var data: List<ArticleModel> = listOf()) :
         notifyDataSetChanged()
     }
 
-    var articlesListener: ArticlesListener? = null
+    var listener: ArticlesListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             ArticleViewHolder(LayoutInflater.from(parent.context)
@@ -32,7 +32,7 @@ class ArticlesAdapter(private var data: List<ArticleModel> = listOf()) :
     override fun getItemCount() = data.size
 
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
-        data[position].let { item -> holder.bindItem(item, articlesListener) }
+        data[position].let { item -> holder.bindItem(item, listener) }
     }
 
     class ArticleViewHolder(view: View): RecyclerView.ViewHolder(view) {
